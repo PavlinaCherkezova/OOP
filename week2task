@@ -1,0 +1,67 @@
+#include <iostream>
+#include <cstring>
+using namespace std;
+class BankAccount
+{
+private:
+    char NameClient [50];
+    char IBAN [20];
+    double Sum;
+public:
+    BankAccount()
+    {
+        strcpy(NameClient, "");
+        strcpy(IBAN, "");
+        Sum = 0.0;
+    }
+   BankAccount(char* _NameClient, char* _IBAN, double _Sum)
+    {
+        strcpy(this->NameClient, _NameClient);
+        strcpy(this->IBAN, _IBAN);
+        this->Sum = _Sum;
+    }
+    const char* getNameClient() const
+    {
+     return NameClient;
+    }
+    const char* getIBAN() const
+    {
+     return IBAN;
+    }
+    double getSum() const
+    {
+     return Sum;
+    }
+    void PrintAccount() const
+    {
+        cout<<getNameClient()<<endl;
+        cout<<getIBAN()<<endl;
+        cout<<getSum()<<endl;
+    }
+    void PutMoney (BankAccount &b, double _Sum)
+    {
+        b.Sum += _Sum;
+        cout<<b.Sum<<endl;
+    }
+    void TakeMoney (BankAccount &b, double _Sum)
+    {
+        b.Sum -= _Sum;
+        cout<<b.Sum<<endl;
+    }
+    bool operator >= (BankAccount &b1)
+    {
+        if (b1.Sum >= b2.Sum) return true;
+        else return false;
+    }
+
+};
+int main()
+{
+    BankAccount b1, b2;
+    b1 = {"bla", "12345678910", 250.25};
+    b2 = {"BLAbla", "11,12,13,14,15", 300.75};
+    b1.PrintAccount();
+    b1.PutMoney(b1,50.00);
+    cout<< b1.Sum >= b2.Sum;
+    return 0;
+}
