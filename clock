@@ -1,0 +1,123 @@
+#include <iostream>
+#include <cassert>
+#include <cmath>
+
+using namespace std;
+class Time
+{
+private:
+    int hour;
+    int minutes;
+
+public:
+    Time()
+    {
+        hour = 00;
+        minutes = 00;
+    }
+    Time(int _hour, int _minutes)
+    {
+        if(_hour >= 1 && _hour <= 24 && _minutes >= 0 && _minutes <= 59)
+       {
+            this->hour = _hour;
+            this->minutes = _minutes;
+       }
+    }
+    void setHour (int _hour)
+    {
+        if(_hour >= 1 && _hour <= 24) this->hour = _hour;
+        else cout<< "Not correct";
+    }
+    int getHour () const
+    {
+        return hour;
+    }
+    void setMinutes (int _minutes)
+    {
+        if(_minutes >= 0 && _minutes <= 59) this->minutes = _minutes;
+        else cout<< "Not correct";
+    }
+    int getMinutes () const
+    {
+        return minutes;
+    }
+    int fromMidnight(Time &t)
+    {
+        return t.hour * 60 + t.minutes;
+    }
+     int hoursToMin ()
+    {
+            return this->hour * 60 + this->minutes;
+    }
+    Time minToHour (int minutes)
+    {
+            this->hour = minutes / 60;
+            this->minutes = minutes - this->hour * 60;
+            return *this;
+    }
+     Time addMinutes (int minutes)
+    {
+        int temp = this->minutes + minutes;
+        return minToHour(temp);
+    }
+
+    bool operator < (Time &t)
+    {
+        if (this->hour < t.hour) return true;
+        else return false;
+        if(this->hour == t.hour && this->minutes < t.minutes) return true;
+        else return false;
+    }
+    Time operator + (Time t)
+    {
+        Time new_t (addMinutes(t.minutes));
+        new_t.hour += t.hour;
+        if(new_t.hour > 24) new_t.hour -= 24;
+        return new_t;
+    }
+    Time operator - (Time &t)
+    {
+        int summinutes_t = 0, summinutes_this = 0, sum;
+
+        summinutes_t = t.hour * 60 + t.minutes;
+        summinutes_this = this->hour * 60 + this->minutes;
+        sum = abs(summinutes_this - summinutes_t);
+
+        return minToHour(sum);
+    }
+    Time operator * (int number)
+    {
+       int sum = hoursToMin();
+       return minToHour(sum * number);
+    }
+    void print ()const
+{
+    cout<< hour;
+    cout<<minutes;
+}
+};
+Time operator *(const int &number, Time t)
+{
+    int sum = t.hoursToMin();
+    return t.minToHour(sum * number);
+}
+
+void print(const Time& toPrint)
+{
+    toPrint.print();
+}
+int main()
+{
+
+    Time t1(15, 30);
+    Time t2(5, 30);
+    //t1.setHour(13);
+    cout<<t1.getHour()<<endl;
+    cout<<t1.fromMidnight(t1)<<endl;
+    assert (t2 < t1);
+    t1.addMinutes(30);
+    print(t1);
+    print(t1 + t2);
+    print(t2 * 2);
+    return 0;
+}
