@@ -1,0 +1,865 @@
+#include <iostream>
+#include <cstring>
+#include <fstream>
+
+using namespace std;
+enum Rank {Master, Knight, HeadMaster};
+class Name
+{
+private:
+    char *name;
+    void copy_name(const Name &_name)
+    {
+        this->name = new char [ strlen(_name.name) + 1];
+        strcpy(this->name, _name.name);
+    }
+public:
+    Name()
+    {
+        this->name = new char [8];
+         name[0] = '\0';
+    }
+    Name(char *_name)
+    {
+        this->name = new char [strlen(_name) + 1];
+        strcpy (this->name, _name);
+    }
+    Name (const Name &_name)
+    {
+        this->copy_name(_name);
+    }
+    Name& operator = (const Name &_name)
+    {
+        if(this != &_name)
+        {
+            delete [] this->name;
+            this->copy_name(_name);
+        }
+        return *this;
+    }
+    bool operator == (const Name &_name) const
+    {
+        if(strcmp(this->name, _name.name) == 0)
+        return true;
+        else return false;
+    }
+    ~Name()
+    {
+        delete [] this->name;
+    }
+    void printName ()
+    {
+        cout<<this->name<<endl;
+    }
+    friend ostream& operator << (ostream& os, const Name& _name)
+    {
+        os<<_name.name<<endl;
+        return os;
+    }
+};
+
+template <typename T>
+class Vector
+{
+private:
+    size_t Size;
+    size_t Capacity;
+    T *arr;
+    void Copy (const Vector<T> &other); // priemi go kato malka bukva(za vsichki funkcii zapochvashti s glavni bukvi) :)
+    void Erase ();
+    void Resize ();
+public:
+    Vector<T>();
+    Vector<T> (size_t _size, size_t _capacity, T *_arr);
+    Vector<T> (const Vector<T> &vec);
+    Vector<T>& operator = (const Vector<T> &vec);
+    ~Vector<T> ();
+    void setSize (size_t _Size);
+    void setCapacity (size_t Capacity);
+    size_t getSize () const;
+    size_t getCapacity () const;
+
+    void pushBack (T element);
+    void popBack ();
+    void addOnIndex (size_t index, T element);
+    void delOnIndex (size_t index);
+    void print ()const ;
+
+    T& operator [] (unsigned int index);//modifikaciq
+    const T& operator [] (size_t index) const;//za da dostypish ot dr klas element ot masiwa - za getteri
+    Vector<T>& operator + (T &element);
+    Vector<T>& operator - (T &element);
+
+};
+template <typename T>
+Vector<T>:: Vector()
+{
+    this->Capacity = 8;
+    this->Size = 0;
+    this->arr = new T [Capacity];
+}
+template <typename T>
+Vector<T>:: Vector (size_t _size, size_t _capacity, T *_arr)
+{
+    this->Size = _size;
+    this->Capacity = _capacity;
+    this->arr = new T [this->Capacity];
+    for(size_t i = 0; i < this->Size; i++)
+    {
+        this->arr[i] = _arr [i];
+    }
+}
+template <typename T>
+Vector<T>:: Vector (const Vector<T> &vec)
+{
+    if(this =! &vec)
+    {
+        this->Erase();
+        this->Copy(vec);
+    }
+}
+template <typename T>
+Vector<T>& Vector<T> :: operator = (const Vector<T> &vec)
+{
+    if(this != &vec)
+    {
+        this->Erase();
+        this->Copy(vec);
+    }
+    return *this;
+}
+template <typename T>
+Vector<T>:: ~Vector ()
+{
+     this->Erase();
+}
+template <typename T>
+void Vector<T>:: Copy (const Vector<T> &other)
+{
+    this->Capacity = other.Capacity;
+    this->Size = other.Size;
+    this->arr = new T [this->Capacity];
+    for(size_t i = 0; i < this->Size; i++)
+    {
+        this->arr[i] = other.arr [i];
+    }
+}
+template <typename T>
+void Vector<T>:: Erase ()
+{
+    delete [] this->arr;
+}
+template <typename T>
+void Vector<T>:: Resize ()
+{
+    this->Capacity *= 2 + 1;
+    T *arr1 = new T [this->Capacity];
+    for(size_t i = 0; i < this->Size; i++)
+    {
+        arr1[i] = this->arr[i];
+    }
+    this->Erase();
+    arr = arr1;
+}
+template <typename T>
+void Vector<T>:: setSize (size_t _Size)
+{
+    this->Size = _Size;
+}
+template <typename T>
+void Vector<T>:: setCapacity (size_t _Capacity)
+{
+    this->Capacity = _Capacity;
+}
+template <typename T>
+size_t Vector<T>::getSize () const
+{
+    return this->Size;
+}
+template <typename T>
+size_t Vector<T>:: getCapacity () const
+{
+    return this->Capacity;
+}
+template <typename T>
+void Vector<T>:: pushBack (T element)
+{
+    this->Size ++;
+    if(this->Size >= this->Capacity)
+    {
+        this->Resize();
+    }
+    this->arr[Size] = element;
+}
+template <typename T>
+void Vector<T>:: popBack ()
+{
+    this->Size--;
+}
+template <typename T>
+void Vector<T>:: addOnIndex (size_t index, T element)
+{
+    this->Size++;
+    if(this->Size >= this->Capacity)
+    {
+        this->Resize();
+    }
+    for(int i = this->Size; i < index; i--)
+    {
+        this->arr[i] = this->arr[i - 1];
+    }
+    this->arr[index] = element;
+}
+template <typename T>
+void Vector<T>:: delOnIndex (size_t index)
+{
+    this->Size --;
+    for(size_t j = index; j < this->Size - 1; j++)
+        {
+            this->arr[j] = arr[j + 1];
+        }
+}
+template <typename T>
+Vector<T>& Vector<T>:: operator + (T &element)
+{
+   this->pushBack(element);
+   return *this;
+}
+template <typename T>
+Vector<T>& Vector<T>:: operator - (T &element)
+{
+   this->popBack(element);
+   return *this;
+}
+template <typename T>
+T& Vector<T>:: operator [] (size_t index)
+{
+    return this->arr[index];
+}
+template <typename T>
+const T& Vector<T>:: operator [] (size_t index) const
+{
+    return this->arr[index];
+}
+template <typename T>
+void Vector<T>:: print () const
+{
+    for (size_t i = 0; i < Size; i++)
+    {
+        cout<<this->arr[i];
+    }
+}
+class Planet
+{
+private:
+    Name name;
+    Name planetSystem;
+    Name republic;
+
+    void copyPlanet(const Planet& _planet)
+    {
+        this->name = _planet.name;
+        this->planetSystem = _planet.planetSystem;
+        this->republic = _planet.republic;
+    }
+public:
+    Planet () {}
+    Planet (const Name& _name, const Name& _planetSystem, const Name& _republic)
+    {
+        this->name = _name;
+        this->planetSystem = _planetSystem;
+        this->republic = _republic;
+    }
+    Planet (const Planet& _planet)
+    {
+        this->copyPlanet(_planet);
+    }
+    Planet& operator = (const Planet& _planet)
+    {
+        if(this != &_planet)
+        {
+            this->copyPlanet(_planet);
+        }
+        return *this;
+    }
+    Name getPlanetName() const
+    {
+        return this->name;
+    }
+     Name getPlanetRepublic() const
+    {
+        return this->republic;
+    }
+    Name getPlanetSystem() const
+    {
+        return this->planetSystem;
+    }
+    const Name getPlSystem() const
+    {
+        return this->planetSystem;
+    }
+    void printPlanet ()
+    {
+        this->name.printName();
+        this->planetSystem.printName();
+        this->republic.printName();
+    }
+    friend ostream& operator << (ostream& os, const Planet& _planet)
+    {
+        os<<_planet.name<<endl;
+        os<<_planet.republic<<endl;
+        os<<_planet.planetSystem<<endl;
+        return os;
+    }
+    bool operator == (const Planet& _planet)
+    {
+        if(this->name == _planet.name && this->planetSystem == _planet.planetSystem && this->republic == _planet.republic)
+            return true;
+        else return false;
+    }
+    const Planet& getPlanet () const
+    {
+        return *this;
+    }
+};
+class Jedi
+{
+private:
+    Name name;
+    Rank rank;
+    double midi_chlorian;
+    Planet planet;
+    Name spicies;
+    Name militaryRank;
+
+    void copyJedi (const Jedi& _jedi)
+    {
+        this->name = _jedi.name;
+        this->rank = _jedi.rank;
+        this->midi_chlorian = _jedi.midi_chlorian;
+        this->planet = _jedi.planet;
+        this->spicies = _jedi.spicies;
+        this->militaryRank = _jedi.militaryRank;
+    }
+public:
+    Jedi()
+    {
+        this->midi_chlorian = 0;
+    }
+    Jedi(const Name& _name, const Rank& _rank, double &midi_chlorian, const Planet& _planet, const Name& _spicies,const Name& militaryRank)
+    {
+        this->name = _name;
+        this->rank = _rank;
+        this->midi_chlorian = midi_chlorian;
+        this->planet = _planet;
+        this->spicies = _spicies;
+        this->militaryRank = militaryRank;
+    }
+    Jedi (const Jedi& _jedi)
+    {
+       this->copyJedi(_jedi);
+    }
+    Jedi& operator = (const Jedi& _jedi)
+    {
+        if(this != &_jedi)
+        {
+            this->copyJedi(_jedi);
+        }
+        return *this;
+    }
+    Name getJediPlanetName() const
+    {
+        return this->planet.getPlanetName();
+    }
+    Name getJediPlanetRepublic() const
+    {
+        return this->planet.getPlanetRepublic();
+    }
+     Name getJediPlanetSystem() const
+    {
+        return this->planet.getPlanetSystem();
+    }
+    void printJedi()
+    {
+       this->name.printName();
+       cout<<this->rank<<endl;
+       cout<<midi_chlorian<<endl;
+       this->planet.printPlanet();
+       this->spicies.printName();
+       this->militaryRank.printName();
+    }
+    friend ostream& operator << (ostream& os, const Jedi& _jedi)
+    {
+       os<< _jedi.name << endl;
+       os<<_jedi.rank<<endl;
+       os<<_jedi.midi_chlorian<<endl;
+       os<<_jedi.planet<<endl;
+       os<<_jedi.spicies<<endl;
+       os<<_jedi.militaryRank<<endl;
+       return os;
+    }
+    const Jedi& getJedi() const
+    {
+        return *this;
+    }
+};
+class Stormtrooper
+{
+private:
+    Name id;
+    Rank rank;
+    Name type;
+    Planet planet;
+
+    void copyTrooper (const Stormtrooper& _trooper)
+    {
+        this->id = _trooper.id;
+        this->rank = _trooper.rank;
+        this->type = _trooper.type;
+        this->planet = _trooper.planet;
+    }
+public:
+    Stormtrooper(){}
+    Stormtrooper(const Name& _id, const Rank& _rank, const Name& _type, const Planet& _planet)
+    {
+        this->id = _id;
+        this->type = _type;
+        this->rank = _rank;
+        this->planet = _planet;
+    }
+    Stormtrooper(const Stormtrooper& _trooper)
+    {
+        this->copyTrooper(_trooper);
+    }
+    Stormtrooper& operator = (const Stormtrooper& _trooper)
+    {
+        if(this != &_trooper)
+        {
+            this->copyTrooper(_trooper);
+        }
+        return *this;
+    }
+    Name getTroopsPlanetName() const
+    {
+        return this->planet.getPlanetName();
+    }
+    void printStormtrooper()
+    {
+        this->id.printName();
+        cout<<this->rank;
+        this->type.printName();
+        this->planet.printPlanet();
+    }
+    friend ostream& operator << (ostream& os, const Stormtrooper& _troops)
+    {
+       os<< _troops.id << endl;
+       os<<_troops.rank<<endl;
+       os<<_troops.type<<endl;
+       os<<_troops.planet<<endl;
+
+       return os;
+    }
+    const Stormtrooper& getTrooper ()const
+    {
+        return *this;
+    }
+};
+
+class JediTemple
+{
+private:
+    Vector<Jedi> jedi;
+public:
+    void printJedisOnPlanet (const Planet &planet)
+    {
+        for(size_t i = 0; i < this->jedi.getSize(); i++)
+        {
+            if (this->jedi[i].getJediPlanetName() == planet.getPlanetName())
+            {
+                this->jedi[i].printJedi();
+            }
+        }
+    }
+    friend ostream& operator << (ostream& os, const JediTemple& _jedis)
+    {
+       for(size_t i = 0; i < _jedis.jedi.getSize(); i++)
+       {
+            os<< _jedis.jedi[i].getJedi();
+       }
+       return os;
+    }
+    int getJediTempleSize () const
+    {
+        return this->jedi.getSize();
+    }
+};
+class Army
+{
+private:
+    Vector<Stormtrooper> troops;
+public:
+     void printTroopsOnPlanet (const Planet &planet)
+    {
+        for(size_t i = 0; i < this->troops.getSize(); i++)
+        {
+            if (this->troops[i].getTroopsPlanetName() == planet.getPlanetName())
+            {
+                this->troops[i].printStormtrooper();
+            }
+        }
+    }
+    friend ostream& operator << (ostream& os, const Army& _troops)
+    {
+       for(size_t i = 0; i < _troops.troops.getSize(); i++)
+       {
+            os<< _troops.troops[i].getTrooper();
+       }
+       return os;
+    }
+    int getArmySize () const
+    {
+        return this->troops.getSize();
+    }
+};
+class Galaxy
+{
+private:
+    Name name;
+    Vector<Planet> planets;
+
+    void copyGalaxy (const Galaxy& _galaxy)
+    {
+        this->name = _galaxy.name;
+        this->planets = _galaxy.planets;
+    }
+public:
+    Galaxy(){}
+    Galaxy(const Name& _name, Vector<Planet>& _planets)
+    {
+        this->name = _name;
+        this->planets = _planets;
+    }
+    Galaxy(const Galaxy& _galaxy)
+    {
+        this->copyGalaxy(_galaxy);
+    }
+    Galaxy& operator = (const Galaxy& _galaxy)
+    {
+        if(this != &_galaxy)
+        {
+            this->copyGalaxy(_galaxy);
+        }
+        return *this;
+    }
+    void printGalaxy()
+    {
+        this->name.printName();
+        for(size_t i = 0; i < planets.getSize(); i++)
+        {
+            this->planets[i].printPlanet();
+        }
+    }
+    int getPlanetsSize () const
+    {
+        return this->planets.getSize();
+    }
+    const Name getGalaxyName () const
+    {
+        return this->name;
+    }
+    Name getGalPlanetSystem (int index) const
+    {
+        return this->planets[index].getPlanetSystem();
+    }
+    Name getPlanetRepGalaxy (int index) const
+    {
+        return this->planets[index].getPlanetRepublic();
+    }
+    const Galaxy& getGalaxy ()const
+    {
+        return *this;
+    }
+    const Planet& getPlFromGalaxy (int index)const
+    {
+        return planets[index].getPlanet();
+    }
+    friend ostream& operator << (ostream& os, const Galaxy& _galaxy)
+    {
+       os<< _galaxy.name;
+       return os;
+    }
+    bool operator == (const Galaxy& _galaxy)
+    {
+        bool flag = true;
+        if(this->name == _galaxy.name)
+        {
+            for(size_t i = 0; i < this->getPlanetsSize(); i++)
+            {
+               if(this->planets[i] == _galaxy.planets[i]);
+               else flag = false;
+            }
+        }
+        else return false;
+        if(flag) return true;
+        else return false;
+    }
+};
+class GalacticRepublic
+{
+private:
+    Name name;
+    JediTemple jeditemple;
+    Army army;
+    Galaxy galaxy;
+
+    void copyGalRep(const GalacticRepublic& _galrep)
+    {
+        this->name = _galrep.name;
+        this->jeditemple = _galrep.jeditemple;
+        this->army = _galrep.army;
+        this->galaxy = _galrep.galaxy;
+    }
+public:
+    GalacticRepublic () {}
+    GalacticRepublic(const Name& _name, const JediTemple& _temple, const Army _army, const Galaxy& _galaxy)
+    {
+        this->name = _name;
+        this->jeditemple = _temple;
+        this->army = _army;
+        this->galaxy = _galaxy;
+    }
+    GalacticRepublic(const GalacticRepublic& _galrep)
+    {
+        this->copyGalRep(_galrep);
+    }
+    GalacticRepublic& operator = (const GalacticRepublic& _galrep)
+    {
+        if(this != &_galrep)
+        {
+            this->copyGalRep(_galrep);
+        }
+        return *this;
+    }
+    Name getGalRepName()const //republika
+    {
+        return this->name;
+    }
+   int countPlanetsInSystem (const GalacticRepublic &_galrep, const Name& _system) const
+   {
+       int counter = 0;
+       for(size_t i = 0; i < _galrep.galaxy.getPlanetsSize(); i ++)
+       {
+           for(size_t j = i; j < _galrep.galaxy.getPlanetsSize(); j++)
+           {
+               if(_galrep.galaxy.getGalPlanetSystem(i) == _system) counter ++;
+           }
+       }
+       return counter;
+   }
+   friend ostream& operator << (ostream& os, const GalacticRepublic& _galrep)
+    {
+       os<< _galrep.name<<endl;
+
+       return os;
+    }
+    const Name getRepGalGalaxyName ()const//galaktika
+    {
+        return this->galaxy.getGalaxyName();
+    }
+    Name getRepGlGalaxyName ()const//galaktika
+    {
+        return this->galaxy.getGalaxyName();
+    }
+    int getPlanets () const
+    {
+        return this->galaxy.getPlanetsSize();
+    }
+    Name getNamePlRepublic (int index) const
+    {
+        return this->galaxy.getPlanetRepGalaxy(index);
+    }
+    const Galaxy& getGalFromGalRep ()const
+    {
+        return this->galaxy.getGalaxy();
+    }
+    const GalacticRepublic& getGalRep ()const
+    {
+        return *this;
+    }
+    const int getGRArmySize () const
+    {
+        return this->army.getArmySize();
+    }
+    const getGRJediTSize () const
+    {
+        return this->jeditemple.getJediTempleSize();
+    }
+};
+class System
+{
+ private:
+    Vector<Planet> system;
+ public:
+     void planetsByRepublic (const GalacticRepublic& _galrep)
+    {
+        int counter = 0;
+        int index = 0;
+        for(size_t i = 0; i < _galrep.getPlanets(); i++)
+        {
+            if(_galrep.getNamePlRepublic(i) == _galrep.getGalRepName())
+            {
+                this->system.addOnIndex(index, _galrep.getGalFromGalRep().getPlFromGalaxy(i));
+                index ++;
+            }
+        }
+    }
+    int dominatedSystems (const System& _system, const GalacticRepublic& _galrep)
+    {
+        int planetsFromSameSystem = 0;
+        int countDominatedSystems = 0;
+        for (size_t i = 0 ; i <_system.system.getSize() ; i++) //na republikata i ot sistemata
+        {
+            if(_system.system[i].getPlanetSystem() == "0")
+            {
+                for(size_t j = i; j <_system.system.getSize(); j++)
+                {
+                    if(_system.system[i].getPlanetSystem() == _system.system[j].getPlanetSystem())
+                    {
+                        planetsFromSameSystem ++;
+                        _system.system[j].getPlanetSystem() = "0";
+                    }
+                }
+            }
+            if (planetsFromSameSystem >= 3)
+            {
+                if((_galrep.countPlanetsInSystem(_galrep, _system.system[i].getPlSystem())) / 2 <= planetsFromSameSystem) countDominatedSystems ++;
+            }
+        }
+        return countDominatedSystems;
+    }
+
+};
+class Republic
+{
+private:
+    Vector<GalacticRepublic> republics;
+public:
+    int getRepSize () const
+    {
+        return this->republics.getSize();
+    }
+    const Name getGalaxyNameFromGalRep (int index) const
+    {
+        return this->republics[index].getRepGalGalaxyName();
+    }
+    const int getArmySizeFromRep (int index) const
+    {
+        return this->republics[index].getGRArmySize();
+    }
+    const int getJediTSizeFromRep (int index) const
+    {
+        return this->republics[index].getGRJediTSize();
+    }
+    int indexDominatingRepublic (const Republic &_republics, const Galaxy& _galaxy) const
+   {
+       int index = 0;
+       int maxDominated = 0;
+
+       for(size_t i = 0; i < _republics.getRepSize() && maxDominated != 0; i++)
+      {
+          if(_republics.getGalaxyNameFromGalRep(i) == _galaxy.getGalaxyName())
+          {
+            System s0;
+            s0.planetsByRepublic(_republics.republics[i]);
+            maxDominated = s0.dominatedSystems(s0, _republics.republics[i]);
+          }
+      }
+       for(size_t i = 0; i < _republics.getRepSize(); i++)
+      {
+          if(republics[i].getRepGalGalaxyName() == _galaxy.getGalaxyName())
+          {
+              System s1;
+              s1.planetsByRepublic(_republics.republics[i]);
+              if(s1.dominatedSystems(s1, _republics.republics[i]) > maxDominated) //poveche zavladeni sistemi ot pyrwata sys syshtata sistema
+                {
+                   index = i; //index galactic republic s nai mnogo sistemi
+                   maxDominated = s1.dominatedSystems(s1, _republics.republics[i]);
+                }
+          }
+        }
+      return index;
+   }
+    bool republicDominates (const Republic &_republics, const Galaxy& _galaxy) const
+   {
+       int index;
+       index = _republics.indexDominatingRepublic(_republics, _galaxy);
+       if(_republics.getArmySizeFromRep(index) > _republics.getJediTSizeFromRep(index)) return true;
+       else return false;
+   }
+   const GalacticRepublic& getGalRepFromRepublics (int index) const
+   {
+       return this->republics[index].getGalRep();
+   }
+   const Republic& getRepublics () const
+   {
+       return *this;
+   }
+   const Name& getRepublic (int index) const
+   {
+       return this->republics[index].getGalRepName();
+   }
+};
+
+class Universe
+{
+private:
+    Vector<Galaxy> galaxys;
+    Vector<Republic> republics;
+
+    void copyUniverse(const Universe& _uni)
+    {
+        this->galaxys = _uni.galaxys;
+        this->republics = _uni.republics;
+    }
+public:
+    Universe () {}
+    Universe(const Vector<Galaxy>& _galaxy, const Vector<Republic>& _republics)
+    {
+        this->galaxys = _galaxy;
+        this->republics = _republics;
+    }
+    Universe (const Universe& _uni)
+    {
+        this->copyUniverse(_uni);
+    }
+    Universe& operator = (const Universe& _uni)
+    {
+        if(this != &_uni)
+        {
+            this->copyUniverse(_uni);
+        }
+    }
+    void doMap (const Universe& _universe)
+    {
+        int index;
+        ofstream of ("Map.txt");
+        for(size_t i = 0; i < galaxys.getSize(); i++)
+        {
+            if(_universe.republics[i].republicDominates(_universe.republics[i].getRepublics(), _universe.galaxys[i]))
+            {
+                index = _universe.republics[i].getRepublics().indexDominatingRepublic(_universe.republics[i].getRepublics(), _universe.galaxys[i]);// masiw ot republiki i edna galaktika
+
+                of<<_universe.galaxys[i]<<" - "<< _universe.republics[i].getGalRepFromRepublics(index);
+
+            }
+        }
+        of.close();
+    }
+
+};
+
+int main()
+{
+
+    return 0;
+}
