@@ -1,0 +1,21 @@
+#include <iostream>
+
+using namespace std;
+const unsigned int Size = 10;
+char* strDuplicate (char *_str)
+{
+    char *newStr = new char [Size];
+    for(size_t i = 0; i < Size; i++)
+    {
+        newStr[i] = _str[i];
+    }
+    return newStr;
+}
+
+int main()
+{
+    char str[Size]="HEllO BYE";
+    cout<<str<<endl;
+    cout<<strDuplicate(str);
+    return 0;
+}
