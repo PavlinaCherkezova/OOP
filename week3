@@ -1,0 +1,46 @@
+#include <iostream>
+#include <cstring>
+
+
+using namespace std;
+char* together (char* s1, char* s2);
+void equalElements (char* s1, char* s2);
+void eraseElement (char* s2, size_t index);
+
+char* together (char* s1, char* s2)
+{
+    equalElements(s1,s2);
+    int sumSize = strlen(s1) + strlen(s2);
+    char* newStr = new char [sumSize + 1];
+    strcpy (newStr, s1);
+    strcmp(newStr, s2);
+    return newStr;
+
+}
+void  equalElements (char* s1, char* s2)
+{
+    for(size_t i = 0; s1[i] != '/0'; i++)
+    {
+        for(size_t j = 0; s2[j] != '/0'; j++)
+        {
+            if(s1[i] == s2[j]) eraseElement(s2, j);
+        }
+    }
+
+}
+void eraseElement (char* s2, size_t index)
+{
+    for(size_t i = index; s2[i] != '/0'; i++)
+    {
+        s2[i] = s2[i+1];
+    }
+}
+int main()
+{
+    char s1[]= "Hello";
+    char s2[]= "eho";
+    cout<<strcat(s1, s2);
+    equalElements(s1, s2);
+    cout<<strcat(s1, s2);
+    return 0;
+}
