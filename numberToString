@@ -1,0 +1,92 @@
+#include <iostream>
+#include <cmath>
+//ne pokazva rezultat
+using namespace std;
+char* fromNumber (int number);
+char* currChar (char* temp);
+int counterFull (char* str);
+int firstDigit (int number, int Size);
+void defaultChar (char *str, int Size);
+int counter (int number);
+int lastDigits (int number, int Size);
+
+
+char* fromNumber(int number)
+{
+    int Size = counter(number);
+    int currSize = Size;
+    int temp = number, n = 0;
+    char tempStr [Size];
+    defaultChar(tempStr, Size);
+
+    for(size_t i = 0; i < Size; i ++)
+    {
+        n = firstDigit(temp, currSize);
+        if(n <= 32 && n >= 126)
+        {
+            tempStr[i] = n;
+            temp = lastDigits(temp, currSize);
+        }
+        currSize --;
+    }
+    return currChar (tempStr);
+}
+char* currChar (char* temp)
+{
+   int Size = counterFull(temp);
+   char* finalStr = new char [Size + 1];
+   for(size_t i = 0; temp[i] != '/0'; i++)
+   {
+       if(temp[i] != '-1')
+      {
+         for(size_t j = 0; j < Size + 1; j++)
+         {
+             finalStr[j] = temp[i];
+         }
+      }
+   }
+   return finalStr;
+}
+int counterFull (char* str)
+{
+    size_t i = 0, counter = 0;
+    while(str[i] != '/0')
+    {
+        if(str[i] != '-1') counter ++;
+        i ++;
+    }
+   return counter;
+}
+int firstDigit (int number, int Size)
+{
+  return  number /= pow(10,Size - 1);
+}
+int lastDigits (int number, int Size)
+{
+    int num = pow(10 , Size);
+    return number % num;
+}
+void defaultChar (char *str, int Size)
+{
+    for(size_t i = 0; i < Size; i ++)
+    {
+        str[i] = '-1';
+    }
+}
+int counter (int number)
+{
+    int counter = 0;
+    while (number > 0)
+    {
+        number /= 10;
+        counter ++;
+    }
+    return counter;
+}
+
+int main()
+{
+    int number = 3210565; //=" iA"
+    cout<<fromNumber(number)<<endl;
+    return 0;
+}
